@@ -1,0 +1,39 @@
+# ========================
+# Python / Backend
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.env.*
+*.log
+
+# ========================
+# Next.js / Frontend
+# ========================
+node_modules/
+.next/
+out/
+build/
+.vercel/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+
+# ========================
+# OS & IDE Files
+# ========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ========================
+# Data & Assets (Optional)
+# ========================
+# Note: If your PDF is massive, ignore it. 
+# The seerah_pages.json is small enough to commit, but the PDF should stay local.
+*.pdf
