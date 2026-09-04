@@ -8,6 +8,8 @@ import logging
 from google import genai
 from google.genai import types
 
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from google.genai.errors import APIError
 from models import QuizQuestion, Language, ChatMessage
 from config import settings
 
@@ -29,6 +31,11 @@ def _get_language_instruction(language: Language) -> str:
         return "You MUST translate your entire response into clear, natural, and grammatically correct Urdu."
     return "Respond in English."
 
+@retry(
+    stop=stop_after_attempt(4), 
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    retry=retry_if_exception_type(APIError)
+)
 
 def generate_quiz(text: str, language: Language) -> list[QuizQuestion]:
     """Generates a 20-question quiz returning a strict JSON array matching QuizQuestion."""

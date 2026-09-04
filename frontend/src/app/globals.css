@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 
+  Tailwind v4 Theme Configuration 
+  Any variable prefixed with --color- automatically generates 
+  bg-, text-, and border- utility classes.
+*/
+@theme {
+  --color-seerah-bg: #F9F8F6;
+  --color-seerah-surface: #FFFFFF;
+  --color-seerah-border: #E5E3DB;
+  --color-seerah-text: #1F2937;
+  --color-seerah-muted: #6B7280;
+  --color-seerah-accent: #4B6354;
+  --color-seerah-accentHover: #3A4D41;
+  --color-seerah-correct: #059669;
+  --color-seerah-wrong: #DC2626;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), ui-serif, Georgia, serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Custom Base Styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-seerah-bg);
+  color: var(--color-seerah-text);
+  font-family: var(--font-sans);
 }
