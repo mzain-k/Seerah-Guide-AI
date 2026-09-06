@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { QuizQuestion } from "@/lib/api";
 import { CheckCircle2, XCircle, ArrowRight, BookOpen } from "lucide-react";
 
 export default function QuizView({ questions, onRestart }: { questions: QuizQuestion[], onRestart: () => void }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+  // Hydration guard to prevent server/client mismatch
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
+  // Persistent States
+  const [currentIndex, setCurrentIndex] = useLocalStorage<number>("seerah_quiz_index", 0);
+  const [selectedAnswer, setSelectedAnswer] = useLocalStorage<string | null>("seerah_quiz_selected", null);
+  const [score, setScore] = useLocalStorage<number>("seerah_quiz_score", 0);
+  const [isComplete, setIsComplete] = useLocalStorage<boolean>("seerah_quiz_complete", false);
+
+  // Wrapper to clean up state when starting a new session
+  const handleFullRestart = () => {
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setScore(0);
+    setIsComplete(false);
+    onRestart(); // Calls the parent function to clear the main session payload
+  };
+
+  if (!isMounted) return null;
 
   const currentQ = questions[currentIndex];
   const isAnswered = selectedAnswer !== null;
@@ -39,7 +56,7 @@ export default function QuizView({ questions, onRestart }: { questions: QuizQues
           <div className="w-full bg-gray-200 rounded-full h-3 mb-6 overflow-hidden">
             <div className="bg-seerah-accent h-3 rounded-full transition-all duration-1000" style={{ width: `${(score / questions.length) * 100}%` }}></div>
           </div>
-          <button onClick={onRestart} className="bg-seerah-accent text-white px-6 py-2 rounded-lg hover:bg-seerah-accentHover transition">
+          <button onClick={handleFullRestart} className="bg-seerah-accent text-white px-6 py-2 rounded-lg hover:bg-seerah-accentHover transition">
             Start New Session
           </button>
         </div>
