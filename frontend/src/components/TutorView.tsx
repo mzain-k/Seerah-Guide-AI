@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
-import { Send, User, BookOpen } from "lucide-react";
+import { Send, User, BookOpen, ArrowLeft } from "lucide-react";
 import { chatTutor, ChatMessage, StudyResponse } from "@/lib/api";
 
-export default function TutorView({ sessionData }: { sessionData: StudyResponse }) {
+export default function TutorView({ sessionData, onExit }: { sessionData: StudyResponse, onExit: () => void }) {
   // Initialize chat with the AI's first generated lesson
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: sessionData.content as string }
@@ -55,6 +55,13 @@ export default function TutorView({ sessionData }: { sessionData: StudyResponse 
       {/* Header */}
       <div className="bg-seerah-bg border-b border-seerah-border p-4 flex justify-between items-center z-10">
         <div className="flex items-center gap-3">
+          <button 
+            onClick={onExit}
+            className="p-2 hover:bg-seerah-border rounded-lg transition-colors text-seerah-muted hover:text-seerah-text"
+            title="End Session and Return to Dashboard"
+          >
+            <ArrowLeft size={20} />
+          </button>
           <BookOpen className="text-seerah-accent" />
           <h2 className="font-serif font-bold text-lg text-seerah-text">Tutor Session</h2>
         </div>

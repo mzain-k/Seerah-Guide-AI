@@ -66,7 +66,7 @@ export default function Dashboard() {
     return (
       <main className="min-h-screen bg-seerah-bg p-4 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
-          <TutorView sessionData={result} />
+          <TutorView sessionData={result} onExit={() => setResult(null)} />
         </div>
       </main>
     );

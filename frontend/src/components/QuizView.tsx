@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { QuizQuestion } from "@/lib/api";
-import { CheckCircle2, XCircle, ArrowRight, BookOpen } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight, ArrowLeft, BookOpen } from "lucide-react";
 
 export default function QuizView({ questions, onRestart }: { questions: QuizQuestion[], onRestart: () => void }) {
   // Hydration guard to prevent server/client mismatch
@@ -83,6 +83,15 @@ export default function QuizView({ questions, onRestart }: { questions: QuizQues
 
   return (
     <div className="max-w-3xl mx-auto">
+      {/* Top Navigation */}
+      <button 
+        onClick={handleFullRestart}
+        className="mb-6 flex items-center gap-2 text-seerah-muted hover:text-seerah-text font-medium transition-colors"
+      >
+        <ArrowLeft size={18} />
+        Back to Dashboard
+      </button>
+
       {/* Progress Header */}
       <div className="flex justify-between items-center mb-8 text-sm font-medium text-seerah-muted tracking-wide">
         <span>Question {currentIndex + 1} of {questions.length}</span>
