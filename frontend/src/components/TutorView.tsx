@@ -106,13 +106,26 @@ export default function TutorView({ sessionData }: { sessionData: StudyResponse 
       {/* Input Area */}
       <div className="p-4 bg-white border-t border-seerah-border">
         <div className="max-w-3xl mx-auto relative flex items-center">
-          <input
-            type="text"
+          <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Ask a question about this lesson..."
-            className="w-full bg-seerah-bg border border-seerah-border rounded-xl py-4 pl-6 pr-16 text-seerah-text focus:outline-none focus:ring-2 focus:ring-seerah-accent transition-all"
+            onChange={(e) => {
+              setInput(e.target.value);
+              // Auto-resize magic: reset height to auto, then set to scrollHeight
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault(); // Prevent standard new line
+                handleSend();
+                // Reset height back to default after sending
+                e.currentTarget.style.height = "auto";
+              }
+            }}
+            placeholder="Ask a question... (Shift + Enter for new line)"
+            rows={1}
+            className="w-full bg-seerah-bg border border-seerah-border rounded-xl py-4 pl-6 pr-16 text-seerah-text focus:outline-none focus:ring-2 focus:ring-seerah-accent transition-all resize-none overflow-y-auto max-h-[200px]"
+            style={{ minHeight: "58px" }}
           />
           <button
             onClick={handleSend}
