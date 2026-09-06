@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@plugin "@tailwindcss/typography";
 /* 
   Tailwind v4 Theme Configuration 
   Any variable prefixed with --color- automatically generates 

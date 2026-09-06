@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { generateSession, StudyRequest, StudyResponse, QuizQuestion } from "@/lib/api";
 import QuizView from "@/components/QuizView";
+import TutorView from "@/components/TutorView";
 import { BookOpen } from "lucide-react";
 
 export default function Dashboard() {
@@ -28,11 +29,20 @@ export default function Dashboard() {
     }
   };
 
-  // If we have a Quiz Result, render the Quiz UI instead of the form
+    // Route to Quiz UI
   if (result && result.session_type === "quiz" && Array.isArray(result.content)) {
     return (
       <main className="min-h-screen bg-seerah-bg p-4 md:p-12">
         <QuizView questions={result.content} onRestart={() => setResult(null)} />
+      </main>
+    );
+  }
+
+  // Route to Tutor UI
+  if (result && result.session_type === "tutor" && typeof result.content === "string") {
+    return (
+      <main className="min-h-screen bg-seerah-bg p-4 md:p-8">
+        <TutorView sessionData={result} />
       </main>
     );
   }
@@ -65,7 +75,7 @@ export default function Dashboard() {
               <label className="text-sm font-semibold text-seerah-text tracking-wide">Mode</label>
               <select value={sessionType} onChange={(e) => setSessionType(e.target.value as "quiz" | "tutor")} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none transition appearance-none">
                 <option value="quiz">Quiz Master (Interactive MCQ)</option>
-                <option value="tutor" disabled>Tutor Lesson (Coming Next)</option>
+                <option value="tutor">Tutor Lesson (AI Markdown Essay)</option>
               </select>
             </div>
 
