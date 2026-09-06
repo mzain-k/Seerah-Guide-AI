@@ -1,11 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-/* 
-  Tailwind v4 Theme Configuration 
-  Any variable prefixed with --color- automatically generates 
-  bg-, text-, and border- utility classes.
-*/
+
 @theme {
+  /* Keep your existing colors... */
   --color-seerah-bg: #F9F8F6;
   --color-seerah-surface: #FFFFFF;
   --color-seerah-border: #E5E3DB;
@@ -16,13 +14,21 @@
   --color-seerah-correct: #059669;
   --color-seerah-wrong: #DC2626;
 
+  /* Add the font variables */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-lora), ui-serif, Georgia, serif;
+  --font-urdu: 'Noto Nastaliq Urdu', serif;
 }
 
-/* Custom Base Styles */
+/* Base Styles */
 body {
   background-color: var(--color-seerah-bg);
   color: var(--color-seerah-text);
   font-family: var(--font-sans);
+}
+
+/* Urdu Class Utility */
+.urdu-text {
+  font-family: var(--font-urdu);
+  line-height: 2.5; /* Nastaliq needs taller line height to not clip */
 }

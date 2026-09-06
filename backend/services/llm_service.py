@@ -27,9 +27,7 @@ SYSTEM_INSTRUCTION = """You are an expert, orthodox Islamic scholar specializing
 """
 
 def _get_language_instruction(language: Language) -> str:
-    if language == Language.URDU:
-        return "You MUST translate your entire response into clear, natural, and grammatically correct Urdu."
-    return "Respond in English."
+    return f"CRITICAL: The entire output, including questions, options, and explanations, MUST be written in {language.upper()}."
 
 @retry(
     stop=stop_after_attempt(4), 
