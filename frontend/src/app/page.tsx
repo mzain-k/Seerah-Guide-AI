@@ -2,18 +2,28 @@
 
 import { useState } from "react";
 import { generateSession, StudyRequest, StudyResponse, QuizQuestion } from "@/lib/api";
+import { useEffect } from "react";
 import QuizView from "@/components/QuizView";
 import TutorView from "@/components/TutorView";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { BookOpen } from "lucide-react";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<StudyResponse | null>(null);
+  const [result, setResult] = useLocalStorage<StudyResponse | null>("seerah-active-session", null);
 
   const [startPage, setStartPage] = useState<number>(24);
   const [endPage, setEndPage] = useState<number>(29);
   const [sessionType, setSessionType] = useState<"quiz" | "tutor">("quiz");
+  
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null; // Prevents UI flicker on reload
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
