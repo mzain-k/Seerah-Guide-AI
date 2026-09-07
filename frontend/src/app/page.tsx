@@ -27,6 +27,14 @@ export default function Dashboard() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Add this validation block
+    if (startPage > endPage) {
+      setError("Start page cannot be greater than the end page.");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Pass the dynamic language state, not hardcoded "english"
       const data = await generateSession({ 
