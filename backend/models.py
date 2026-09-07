@@ -8,7 +8,7 @@ read, independent of whatever the user selected in the UI.
 from enum import Enum
 from typing import Literal, Union
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from config import settings
 
@@ -24,33 +24,21 @@ class SessionType(str, Enum):
 
 
 class StudyRequest(BaseModel):
-    """Initial request to generate a Tutor lesson or a Quiz for a page range."""
+    start_page: int
+    end_page: int
+    session_type: Language  # (or Literal/Enum based on your code)
+    language: str
 
-    start_page: int = Field(..., ge=1)
-    end_page: int = Field(..., ge=1)
-    session_type: SessionType
-    language: Language = Language.ENGLISH
-
-    @field_validator("end_page")
-    @classmethod
-    def validate_page_range(cls, end_page: int, info) -> int:
-        start_page = info.data.get("start_page")
-        if start_page is None:
-            return end_page
-        if end_page < start_page:
-            raise ValueError("end_page must be >= start_page")
-        span = end_page - start_page + 1
-        if span > settings.MAX_PAGES_PER_REQUEST:
-            raise ValueError(
-                f"Page range too large: requested {span} pages, "
-                f"max is {settings.MAX_PAGES_PER_REQUEST}"
-            )
-        if end_page > settings.TOTAL_PAGES:
-            raise ValueError(
-                f"end_page {end_page} exceeds source length "
-                f"({settings.TOTAL_PAGES} pages)"
-            )
-        return end_page
+    @model_validator(mode='after')
+    def check_page_range(self):
+        if self.start_page > self.end_page:
+            raise ValueError('Start page cannot be greater than end page.')
+        
+        # Optional: You can also restrict how many pages they request at once
+        if (self.end_page - self.start_page) > 10:
+            raise ValueError('Please select a range of 10 pages or fewer to prevent API timeouts.')
+            
+        return self
 
 
 class ChatMessage(BaseModel):
