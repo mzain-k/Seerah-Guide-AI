@@ -5,10 +5,20 @@ import { generateSession, StudyRequest, StudyResponse } from "@/lib/api";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import QuizView from "@/components/QuizView";
 import TutorView from "@/components/TutorView";
+import LoginView from "@/components/LoginView";
 import { BookOpen } from "lucide-react";
 
 export default function Dashboard() {
   const [isMounted, setIsMounted] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("seerah_auth_token");
+    if (savedToken) setToken(savedToken);
+    setIsHydrated(true);
+  }, []);
+
   useEffect(() => setIsMounted(true), []);
 
   const [loading, setLoading] = useState(false);
@@ -23,12 +33,12 @@ export default function Dashboard() {
   const [sessionType, setSessionType] = useState<"quiz" | "tutor">("quiz");
   const [language, setLanguage] = useState<"english" | "urdu">("english");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Add this validation block
+    // Add this validation block  
     if (startPage > endPage) {
       setError("Start page cannot be greater than the end page.");
       setLoading(false);
@@ -42,7 +52,7 @@ export default function Dashboard() {
         end_page: endPage, 
         session_type: sessionType, 
         language: language 
-      });
+      }, token!);
       setResult(data);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
@@ -74,9 +84,24 @@ export default function Dashboard() {
     return (
       <main className="min-h-screen bg-seerah-bg p-4 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
-          <TutorView sessionData={result} onExit={() => setResult(null)} />
+          <TutorView sessionData={result} token={token} onExit={() => setResult(null)} />
         </div>
       </main>
+    );
+  }
+
+  // Prevent hydration errors by waiting for localStorage check
+  if (!isHydrated) return null; 
+
+  // If no token exists, lock the user out and show Login screen
+  if (!token) {
+    return (
+      <LoginView 
+        onAuthSuccess={(newToken) => {
+          localStorage.setItem("seerah_auth_token", newToken);
+          setToken(newToken);
+        }} 
+      />
     );
   }
 

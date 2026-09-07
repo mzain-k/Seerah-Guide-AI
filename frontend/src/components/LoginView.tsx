@@ -1,143 +1,98 @@
-// frontend/src/lib/api.ts
+import { useState } from "react";
+import { login, register } from "../lib/api";
+import { User, Lock, Loader2 } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+export default function LoginView({ onAuthSuccess }: { onAuthSuccess: (token: string) => void }) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-// --- 1. TYPE DEFINITIONS ---
-export type SessionType = "quiz" | "tutor";
-export type Language = "english" | "urdu";
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
-export interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface ChatRequest {
-  start_page: number;
-  end_page: number;
-  language: Language;
-  chat_history: ChatMessage[];
-  user_message: string;
-}
-
-export interface StudyRequest {
-  start_page: number;
-  end_page: number;
-  session_type: SessionType;
-  language: Language;
-}
-
-export interface QuizQuestion {
-  question: string;
-  options: string[];
-  correct_answer: string;
-  explanation: string;
-  category: string;
-  is_key_takeaway: boolean;
-}
-
-export interface StudyResponse {
-  start_page: number;
-  end_page: number;
-  session_type: SessionType;
-  language: Language;
-  content: string | QuizQuestion[];
-}
-
-// --- 2. AUTHENTICATION ENDPOINTS ---
-
-export async function login(username: string, password: string) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    throw new Error(error?.detail || "Login failed");
-  }
-  return response.json();
-}
-
-export async function register(username: string, password: string) {
-  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    throw new Error(error?.detail || "Registration failed");
-  }
-  return response.json();
-}
-
-// --- 3. SECURED APP ENDPOINTS ---
-// Notice how every app route now requires the JWT token
-
-export async function generateSession(requestData: StudyRequest, token: string): Promise<StudyResponse> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/generate-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      const detail = errorData?.detail;
-      const errorMessage = typeof detail === 'string' ? detail : JSON.stringify(detail);
-      throw new Error(errorMessage || `Server error: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("API Error (generateSession):", error);
-    throw error;
-  }
-}
-
-export async function chatTutor(requestData: ChatRequest, token: string): Promise<{ response: string }> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/tutor/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.detail || `Server error: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("API Error (chatTutor):", error);
-    throw error;
-  }
-}
-
-export async function fetchSessions(token: string) {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/sessions`, {
-      headers: {
-        "Authorization": `Bearer ${token}`
+    try {
+      if (isLogin) {
+        const data = await login(username, password);
+        onAuthSuccess(data.access_token);
+      } else {
+        await register(username, password);
+        // Auto-login after successful registration
+        const data = await login(username, password);
+        onAuthSuccess(data.access_token);
       }
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch sessions");
+    } catch (err: any) {
+      setError(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
     }
-    return await response.json();
-  } catch (error) {
-    console.error("API Error (fetchSessions):", error);
-    throw error;
-  }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-seerah-bg p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-seerah-border p-8">
+        <h2 className="text-2xl font-serif font-bold text-seerah-text mb-6 text-center">
+          {isLogin ? "Welcome to Seerah Tutor" : "Create Private Account"}
+        </h2>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-seerah-muted mb-1">Username</label>
+            <div className="relative">
+              <User className="absolute left-3 top-2.5 text-gray-400" size={18} />
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-seerah-border rounded-lg focus:ring-2 focus:ring-seerah-accent outline-none"
+                required
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-seerah-muted mb-1">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-2.5 text-gray-400" size={18} />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-seerah-border rounded-lg focus:ring-2 focus:ring-seerah-accent outline-none"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-seerah-accent text-white py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors flex justify-center items-center gap-2"
+          >
+            {loading && <Loader2 className="animate-spin" size={18} />}
+            {isLogin ? "Sign In" : "Register"}
+          </button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-seerah-muted">
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button 
+            onClick={() => { setIsLogin(!isLogin); setError(null); }}
+            className="text-seerah-accent font-medium hover:underline"
+          >
+            {isLogin ? "Register here" : "Sign in here"}
+          </button>
+        </p>
+      </div>
+    </div>
+  );
 }

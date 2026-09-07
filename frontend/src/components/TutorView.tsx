@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { Send, User, BookOpen, ArrowLeft } from "lucide-react";
 import { chatTutor, ChatMessage, StudyResponse } from "@/lib/api";
 
-export default function TutorView({ sessionData, onExit }: { sessionData: StudyResponse, onExit: () => void }) {
+export default function TutorView({ sessionData, token, onExit }: { sessionData: StudyResponse, token: string, onExit: () => void }) {
   // Initialize chat with the AI's first generated lesson
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "assistant", content: sessionData.content as string }
@@ -39,7 +39,7 @@ export default function TutorView({ sessionData, onExit }: { sessionData: StudyR
         language: sessionData.language,
         chat_history: messages, // Send history so LLM remembers the context
         user_message: userMsg
-      });
+      }, token);
 
       setMessages([...updatedHistory, { role: "assistant", content: res.response }]);
     } catch (error) {
