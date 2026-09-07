@@ -10,6 +10,9 @@ from models import StudyRequest, StudyResponse, ChatRequest, SessionType
 from services.data_service import data_service
 from services import llm_service
 from database import save_study_session
+from models import UserCreate
+from auth import hash_password
+from database import supabase
 
 # Lifespan manager ensures data loads once on startup and fails fast if broken
 @asynccontextmanager
@@ -105,5 +108,24 @@ async def tutor_chat(request: ChatRequest):
         return {"response": response_text}
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=str(e))
+
+@app.post("/api/auth/register")
+async def register_user(user: UserCreate):
+    """Registers a new user in the custom app_users table."""
+    try:
+        # 1. Hash the raw password
+        hashed_pw = hash_password(user.password)
+        
+        # 2. Insert into PostgreSQL
+        response = supabase.table("app_users").insert({
+            "username": user.username.lower(), # Lowercase ensures 'Zain' and 'zain' are the same user
+            "password_hash": hashed_pw
+        }).execute()
+        
+        return {"message": "User registered successfully", "username": user.username}
+        
+    except Exception as e:
+        # If the unique constraint on the username column fails, Supabase throws an error
+        raise HTTPException(status_code=400, detail="Username already exists or database error.")
 
 # Run locally using: uvicorn main:app --reload

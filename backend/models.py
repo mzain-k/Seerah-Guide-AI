@@ -82,3 +82,8 @@ class StudyResponse(BaseModel):
     session_type: SessionType
     language: Language
     content: Union[str, list[QuizQuestion]]
+
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
