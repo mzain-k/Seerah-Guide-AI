@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from models import StudyRequest, StudyResponse, ChatRequest, SessionType
+from auth import hash_password, verify_password, create_access_token
 from services.data_service import data_service
 from services import llm_service
 from database import save_study_session
@@ -127,5 +128,33 @@ async def register_user(user: UserCreate):
     except Exception as e:
         # If the unique constraint on the username column fails, Supabase throws an error
         raise HTTPException(status_code=400, detail="Username already exists or database error.")
+
+@app.post("/api/auth/login")
+async def login_user(user: UserCreate):
+    """Verifies credentials and returns a JWT."""
+    try:
+        # 1. Fetch the user from Supabase
+        response = supabase.table("app_users").select("*").eq("username", user.username.lower()).execute()
+        users = response.data
+        
+        # 2. Check if user exists
+        if not users:
+            raise HTTPException(status_code=401, detail="Invalid username or password.")
+            
+        db_user = users[0]
+        
+        # 3. Verify the password
+        if not verify_password(user.password, db_user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid username or password.")
+            
+        # 4. Generate the token containing their unique database ID
+        access_token = create_access_token(data={"sub": db_user["id"], "username": db_user["username"]})
+        
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error during login.")
 
 # Run locally using: uvicorn main:app --reload
