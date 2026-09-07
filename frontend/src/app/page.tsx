@@ -84,7 +84,7 @@ export default function Dashboard() {
     return (
       <main className="min-h-screen bg-seerah-bg p-4 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
-          <TutorView sessionData={result} token={token} onExit={() => setResult(null)} />
+          <TutorView sessionData={result} token={token!} onExit={() => setResult(null)} />
         </div>
       </main>
     );
