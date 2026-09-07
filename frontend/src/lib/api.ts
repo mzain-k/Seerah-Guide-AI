@@ -55,9 +55,15 @@ export async function generateSession(requestData: StudyRequest): Promise<StudyR
     });
 
     if (!response.ok) {
-      // Extract the exact error message from FastAPI if available
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.detail || `Server error: ${response.status}`);
+      
+      // Check if the detail is an array/object and stringify it so we can read it
+      const detail = errorData?.detail;
+      const errorMessage = typeof detail === 'string' 
+        ? detail 
+        : JSON.stringify(detail);
+        
+      throw new Error(errorMessage || `Server error: ${response.status}`);
     }
 
     return await response.json();

@@ -26,8 +26,8 @@ class SessionType(str, Enum):
 class StudyRequest(BaseModel):
     start_page: int
     end_page: int
-    session_type: Language  # (or Literal/Enum based on your code)
-    language: str
+    session_type: SessionType
+    language: Language
 
     @model_validator(mode='after')
     def check_page_range(self):

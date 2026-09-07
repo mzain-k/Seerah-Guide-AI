@@ -9,6 +9,7 @@ from config import settings
 from models import StudyRequest, StudyResponse, ChatRequest, SessionType
 from services.data_service import data_service
 from services import llm_service
+from database import save_study_session
 
 # Lifespan manager ensures data loads once on startup and fails fast if broken
 @asynccontextmanager
@@ -50,6 +51,30 @@ async def create_session(request: StudyRequest):
         else:
             content = llm_service.generate_tutor_lesson(source_text, request.language)
             
+        # --- NEW DB INSERTION LOGIC ---
+        # Dynamically handle serialization for ANY Pydantic model or list of models
+        if hasattr(content, "model_dump"):
+            # It's a single Pydantic model (e.g., Quiz wrapper)
+            db_content = content.model_dump()
+        elif isinstance(content, list) and len(content) > 0 and hasattr(content[0], "model_dump"):
+            # It's a list of Pydantic models
+            db_content = [item.model_dump() for item in content]
+        else:
+            # It's a plain string (Tutor) or plain dictionary
+            db_content = content
+
+        session_record = {
+            "session_type": request.session_type.value,
+            "start_page": request.start_page,
+            "end_page": request.end_page,
+            "language": request.language.value,
+            "content": db_content
+        }
+        save_study_session(session_record)
+        # ------------------------------    
+        save_study_session(session_record)
+        # ------------------------------
+
         return StudyResponse(
             start_page=request.start_page,
             end_page=request.end_page,
@@ -59,7 +84,6 @@ async def create_session(request: StudyRequest):
         )
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=str(e))
-
 
 @app.post("/api/tutor/chat")
 async def tutor_chat(request: ChatRequest):
