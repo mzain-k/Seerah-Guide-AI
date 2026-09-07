@@ -15,16 +15,23 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 # Initialize a single, reusable client instance
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def save_study_session(session_record: dict):
-    """
-    Inserts a newly generated session into the PostgreSQL database.
-    We wrap this in a try/except block because if the database goes down, 
-    we still want the user to see their generated quiz on the frontend.
-    """
+def save_study_session(session_record: dict, user_id: str):
+    """Inserts a session tied directly to the authenticated user."""
     try:
-        # Supabase Python SDK handles the JSONB serialization automatically
+        session_record["user_id"] = user_id  # Attach the user's UUID before saving
         response = supabase.table("study_sessions").insert(session_record).execute()
         return response.data
     except Exception as e:
         print(f"CRITICAL DB ERROR: Failed to save session - {e}")
         return None
+
+def get_all_sessions(user_id: str):
+    """Fetches session metadata ONLY for the authenticated user."""
+    try:
+        response = supabase.table("study_sessions").select(
+            "id, session_type, start_page, end_page, language, created_at"
+        ).eq("user_id", user_id).order("created_at", desc=True).execute()  # The .eq() filters by user
+        return response.data
+    except Exception as e:
+        print(f"CRITICAL DB ERROR: Failed to fetch sessions - {e}")
+        return []

@@ -7,10 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from models import StudyRequest, StudyResponse, ChatRequest, SessionType
-from auth import hash_password, verify_password, create_access_token
+from auth import hash_password, verify_password, create_access_token, get_current_user
+from fastapi import FastAPI, HTTPException, Depends
 from services.data_service import data_service
 from services import llm_service
-from database import save_study_session
+from database import save_study_session, get_all_sessions
 from models import UserCreate
 from auth import hash_password
 from database import supabase
@@ -38,7 +39,7 @@ app.add_middleware(
 )
 
 @app.post("/api/generate-session", response_model=StudyResponse)
-async def create_session(request: StudyRequest):
+async def create_session(request: StudyRequest, user_id: str = Depends(get_current_user)):
     """Generates the initial Quiz or Tutor lesson for a given page range."""
     try:
         # Extract exact text layer
@@ -74,9 +75,10 @@ async def create_session(request: StudyRequest):
             "language": request.language.value,
             "content": db_content
         }
-        save_study_session(session_record)
-        # ------------------------------    
-        save_study_session(session_record)
+        
+        # Pass the extracted user_id to the database
+        save_study_session(session_record, user_id)
+
         # ------------------------------
 
         return StudyResponse(
@@ -156,5 +158,11 @@ async def login_user(user: UserCreate):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error during login.")
+
+@app.get("/api/sessions")
+async def fetch_sessions(user_id: str = Depends(get_current_user)):
+    """Retrieves all historical study sessions for the logged-in user."""
+    sessions = get_all_sessions(user_id)
+    return {"sessions": sessions}
 
 # Run locally using: uvicorn main:app --reload
