@@ -90,7 +90,7 @@ export default function Dashboard() {
   // Route to Quiz UI
   if (result && result.session_type === "quiz" && Array.isArray(result.content)) {
     return (
-      <main className="min-h-screen bg-seerah-bg p-4 sm:p-6 md:p-12" dir={layoutDir}>
+      <main className="min-h-dvh bg-seerah-bg p-4 sm:p-6 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
           <QuizView 
             key={result.id}
@@ -108,7 +108,7 @@ export default function Dashboard() {
   // Route to Tutor UI
   if (result && result.session_type === "tutor" && typeof result.content === "string") {
     return (
-      <main className="min-h-screen bg-seerah-bg p-4 sm:p-6 md:p-8" dir={layoutDir}>
+      <main className="min-h-dvh bg-seerah-bg p-4 sm:p-6 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
           <TutorView key={result.id}  sessionData={result} token={token!} username={username || localStorage.getItem("seerah_username") || "Student"} onExit={() => setResult(null)} />
         </div>

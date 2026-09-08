@@ -60,7 +60,7 @@ export default function TutorView({ sessionData, token, username, onExit }: { se
   const isUrdu = sessionData.language === "urdu";
 
   return (
-    <div className="max-w-4xl mx-auto h-[85vh] h-[85dvh] flex flex-col bg-seerah-surface rounded-2xl shadow-sm border border-seerah-border overflow-hidden">
+    <div className="max-w-4xl mx-auto h-[calc(100dvh-2rem)] sm:h-[85vh] flex flex-col bg-seerah-surface rounded-2xl shadow-sm border border-seerah-border overflow-hidden">
       
       {/* Header */}
       <div className="bg-seerah-bg border-b border-seerah-border p-3 sm:p-4 flex flex-wrap gap-2 justify-between items-center z-10">
