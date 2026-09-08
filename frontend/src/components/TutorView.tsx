@@ -6,13 +6,21 @@ import { Send, User, BookOpen, ArrowLeft } from "lucide-react";
 import { chatTutor, ChatMessage, StudyResponse } from "@/lib/api";
 
 export default function TutorView({ sessionData, token, onExit }: { sessionData: StudyResponse, token: string, onExit: () => void }) {
-  // Initialize chat with the AI's first generated lesson
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", content: sessionData.content as string }
-  ]);
+  
+  // 1. INTELLIGENT STATE INITIALIZATION
+  // If chat_history exists in the DB, load it. Otherwise, start fresh with the article.
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (sessionData.chat_history && sessionData.chat_history.length > 0) {
+      return sessionData.chat_history;
+    }
+    return [{ role: "assistant", content: sessionData.content as string }];
+  });
+
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const activeUser = localStorage.getItem("username") || "Student";
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -38,7 +46,8 @@ export default function TutorView({ sessionData, token, onExit }: { sessionData:
         end_page: sessionData.end_page,
         language: sessionData.language,
         chat_history: messages, // Send history so LLM remembers the context
-        user_message: userMsg
+        user_message: userMsg,
+        user_name: activeUser
       }, token);
 
       setMessages([...updatedHistory, { role: "assistant", content: res.response }]);
@@ -117,15 +126,13 @@ export default function TutorView({ sessionData, token, onExit }: { sessionData:
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
-              // Auto-resize magic: reset height to auto, then set to scrollHeight
               e.target.style.height = "auto";
               e.target.style.height = `${e.target.scrollHeight}px`;
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); // Prevent standard new line
+                e.preventDefault(); 
                 handleSend();
-                // Reset height back to default after sending
                 e.currentTarget.style.height = "auto";
               }
             }}

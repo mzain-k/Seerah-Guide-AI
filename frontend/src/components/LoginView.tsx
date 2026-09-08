@@ -2,7 +2,8 @@ import { useState } from "react";
 import { login, register } from "../lib/api";
 import { User, Lock, Loader2 } from "lucide-react";
 
-export default function LoginView({ onAuthSuccess }: { onAuthSuccess: (token: string) => void }) {
+// Change this line
+export default function LoginView({ onAuthSuccess }: { onAuthSuccess: (token: string, username: string) => void }) {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -17,12 +18,11 @@ export default function LoginView({ onAuthSuccess }: { onAuthSuccess: (token: st
     try {
       if (isLogin) {
         const data = await login(username, password);
-        onAuthSuccess(data.access_token);
+        onAuthSuccess(data.access_token, data.username); // Pass both
       } else {
         await register(username, password);
-        // Auto-login after successful registration
         const data = await login(username, password);
-        onAuthSuccess(data.access_token);
+        onAuthSuccess(data.access_token, data.username); // Pass both
       }
     } catch (err: any) {
       setError(err.message || "Authentication failed");

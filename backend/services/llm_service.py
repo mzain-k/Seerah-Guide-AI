@@ -104,7 +104,7 @@ def generate_tutor_lesson(text: str, language: Language) -> str:
         raise RuntimeError("Failed to generate tutor lesson from LLM.") from e
 
 
-def chat_tutor(text: str, chat_history: list[ChatMessage], user_message: str, language: Language) -> str:
+def chat_tutor(text: str, chat_history: list[ChatMessage], user_message: str, language: Language, user_name: str) -> str:
     """Handles follow-up cross-questions in Tutor Mode by injecting chat history."""
     
     # Format the history into the SDK's expected structure
@@ -120,6 +120,8 @@ def chat_tutor(text: str, chat_history: list[ChatMessage], user_message: str, la
     {text}
     
     Language Instruction: {_get_language_instruction(language)}
+
+    Student Profile: The student's name is {user_name.capitalize()}. Address them directly by their name in your response to build a respectful, personal connection as a scholar.
     
     User Question: {user_message}
     """

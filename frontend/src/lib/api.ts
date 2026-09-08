@@ -17,6 +17,7 @@ export interface ChatRequest {
   language: Language;
   chat_history: ChatMessage[];
   user_message: string;
+  user_name: string;
 }
 
 export interface StudyRequest {
@@ -36,11 +37,14 @@ export interface QuizQuestion {
 }
 
 export interface StudyResponse {
+  id: string;
   start_page: number;
   end_page: number;
   session_type: SessionType;
   language: Language;
   content: string | QuizQuestion[];
+  score: number | null;
+  chat_history?: any[];
 }
 
 // --- 2. AUTHENTICATION ENDPOINTS ---
@@ -141,3 +145,25 @@ export async function fetchSessions(token: string) {
     throw error;
   }
 }
+
+export const saveQuizScore = async (sessionId: string, score: number, totalQuestions: number, token: string) => {
+  const response = await fetch("http://localhost:8000/api/quiz/score", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ 
+      session_id: sessionId, 
+      score: score, 
+      total_questions: totalQuestions 
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.detail || `Server error: ${response.status}`);
+  }
+
+  return await response.json();
+};

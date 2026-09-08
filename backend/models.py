@@ -55,6 +55,7 @@ class ChatRequest(BaseModel):
     language: Language = Language.ENGLISH
     chat_history: list[ChatMessage]
     user_message: str = Field(..., min_length=1)
+    user_name: str
 
 
 class QuizQuestion(BaseModel):
