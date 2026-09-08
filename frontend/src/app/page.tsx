@@ -113,7 +113,7 @@ export default function Dashboard() {
     return (
       <main className="min-h-screen bg-seerah-bg p-4 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
-          <TutorView key={result.id} sessionData={result} token={token!} onExit={() => setResult(null)} />
+          <TutorView key={result.id}  sessionData={result} token={token!} username={username || localStorage.getItem("seerah_username") || "Student"} onExit={() => setResult(null)} />
         </div>
       </main>
     );

@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { Send, User, BookOpen, ArrowLeft } from "lucide-react";
 import { chatTutor, ChatMessage, StudyResponse } from "@/lib/api";
 
-export default function TutorView({ sessionData, token, onExit }: { sessionData: StudyResponse, token: string, onExit: () => void }) {
+export default function TutorView({ sessionData, token, username, onExit }: { sessionData: StudyResponse, token: string, username: string, onExit: () => void }) {
   
   // 1. INTELLIGENT STATE INITIALIZATION
   // If chat_history exists in the DB, load it. Otherwise, start fresh with the article.
@@ -20,7 +20,7 @@ export default function TutorView({ sessionData, token, onExit }: { sessionData:
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const activeUser = localStorage.getItem("username") || "Student";
+  const activeUser = localStorage.getItem(" username") || "Student";
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -35,7 +35,6 @@ export default function TutorView({ sessionData, token, onExit }: { sessionData:
     const userMsg = input.trim();
     setInput("");
     
-    // Add user message to UI instantly
     const updatedHistory: ChatMessage[] = [...messages, { role: "user", content: userMsg }];
     setMessages(updatedHistory);
     setIsTyping(true);
@@ -45,9 +44,9 @@ export default function TutorView({ sessionData, token, onExit }: { sessionData:
         start_page: sessionData.start_page,
         end_page: sessionData.end_page,
         language: sessionData.language,
-        chat_history: messages, // Send history so LLM remembers the context
+        chat_history: messages, 
         user_message: userMsg,
-        user_name: activeUser
+        user_name: username // <--- 3. Passing it into the backend request payload here
       }, token);
 
       setMessages([...updatedHistory, { role: "assistant", content: res.response }]);
