@@ -7,7 +7,6 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import QuizView from "@/components/QuizView";
 import TutorView from "@/components/TutorView";
 import LoginView from "@/components/LoginView";
-import { BookOpen } from "lucide-react";
 
 const formatName = (name: string) => name ? name.charAt(0).toUpperCase() + name.slice(1) : "";
 
@@ -60,7 +59,6 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
 
-    // Add this validation block  
     if (startPage > endPage) {
       setError("Start page cannot be greater than the end page.");
       setLoading(false);
@@ -68,7 +66,6 @@ export default function Dashboard() {
     }
 
     try {
-      // Pass the dynamic language state, not hardcoded "english"
       const data = await generateSession({ 
         start_page: startPage, 
         end_page: endPage, 
@@ -93,7 +90,7 @@ export default function Dashboard() {
   // Route to Quiz UI
   if (result && result.session_type === "quiz" && Array.isArray(result.content)) {
     return (
-      <main className="min-h-screen bg-seerah-bg p-4 md:p-12" dir={layoutDir}>
+      <main className="min-h-screen bg-seerah-bg p-4 sm:p-6 md:p-12" dir={layoutDir}>
         <div className={languageClass}>
           <QuizView 
             key={result.id}
@@ -101,7 +98,7 @@ export default function Dashboard() {
             sessionId={result.id}
             token={token!} 
             onRestart={() => setResult(null)} 
-            dbScore={result.score} // <--- ADD THIS LINE
+            dbScore={result.score}
           />
         </div>
       </main>
@@ -111,7 +108,7 @@ export default function Dashboard() {
   // Route to Tutor UI
   if (result && result.session_type === "tutor" && typeof result.content === "string") {
     return (
-      <main className="min-h-screen bg-seerah-bg p-4 md:p-8" dir={layoutDir}>
+      <main className="min-h-screen bg-seerah-bg p-4 sm:p-6 md:p-8" dir={layoutDir}>
         <div className={languageClass}>
           <TutorView key={result.id}  sessionData={result} token={token!} username={username || localStorage.getItem("seerah_username") || "Student"} onExit={() => setResult(null)} />
         </div>
@@ -148,21 +145,21 @@ export default function Dashboard() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-seerah-text mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-seerah-text mb-4">
               Seerah Tutor
             </h1>
-            <p className="text-seerah-muted text-lg max-w-xl mx-auto">
+            <p className="text-seerah-muted text-base sm:text-lg max-w-xl mx-auto">
               Configure your study session parameters to generate personalized questions or begin an interactive tutoring dialogue.
             </p>
           </div>
 
-          <div className="bg-seerah-surface p-8 rounded-2xl shadow-sm border border-seerah-border">
+          <div className="bg-seerah-surface p-5 sm:p-8 rounded-2xl shadow-sm border border-seerah-border">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold tracking-wide">Start Page</label>
                   <input type="number" value={startPage} onChange={(e) => setStartPage(Number(e.target.value))} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none" min={1} />
@@ -173,7 +170,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold tracking-wide">Mode</label>
                   <select value={sessionType} onChange={(e) => setSessionType(e.target.value as "quiz" | "tutor")} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none appearance-none">
@@ -205,61 +202,5 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
-  );
-
-  return (
-    <main className="min-h-screen bg-seerah-bg text-seerah-text flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-8">
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center p-3 bg-seerah-surface rounded-full shadow-sm border border-seerah-border mb-2">
-            <BookOpen className="text-seerah-accent w-8 h-8" />
-          </div>
-          <h1 className="text-4xl font-serif font-bold text-seerah-text">Seerah Tutor</h1>
-          <p className="text-seerah-muted text-lg">Deep contextual learning from The Sealed Nectar</p>
-        </div>
-
-        <div className="bg-seerah-surface p-8 rounded-2xl shadow-sm border border-seerah-border">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide">Start Page</label>
-                <input type="number" value={startPage} onChange={(e) => setStartPage(Number(e.target.value))} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none" min={1} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide">End Page</label>
-                <input type="number" value={endPage} onChange={(e) => setEndPage(Number(e.target.value))} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none" min={1} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide">Mode</label>
-                <select value={sessionType} onChange={(e) => setSessionType(e.target.value as "quiz" | "tutor")} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none appearance-none">
-                  <option value="quiz">Quiz Master</option>
-                  <option value="tutor">Tutor Lesson</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold tracking-wide">Language</label>
-                <select value={language} onChange={(e) => setLanguage(e.target.value as "english" | "urdu")} className="w-full p-3 bg-seerah-bg border border-seerah-border rounded-xl focus:ring-2 focus:ring-seerah-accent outline-none appearance-none">
-                  <option value="english">English</option>
-                  <option value="urdu">Urdu (اردو)</option>
-                </select>
-              </div>
-            </div>
-
-            <button type="submit" disabled={loading} className="w-full bg-seerah-accent text-white p-4 rounded-xl font-semibold hover:bg-seerah-accentHover transition-all disabled:opacity-70 flex justify-center items-center gap-2">
-              {loading ? <span className="animate-pulse">Analyzing Pages...</span> : "Generate Session"}
-            </button>
-          </form>
-        </div>
-
-        {error && (
-          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm text-center">
-            {error}
-          </div>
-        )}
-      </div>
-    </main>
   );
 }

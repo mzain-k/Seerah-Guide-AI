@@ -21,10 +21,39 @@
 }
 
 /* Base Styles */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--color-seerah-bg);
   color: var(--color-seerah-text);
   font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS auto-zoom on input focus (inputs need >=16px font-size) */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Smooth transitions on interactive elements */
+button, input, select {
+  transition: all 0.15s ease;
+}
+
+/* Custom scrollbar (desktop) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-seerah-border);
+  border-radius: 8px;
 }
 
 /* Urdu Class Utility */

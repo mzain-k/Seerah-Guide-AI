@@ -46,7 +46,7 @@ export default function TutorView({ sessionData, token, username, onExit }: { se
         language: sessionData.language,
         chat_history: messages, 
         user_message: userMsg,
-        user_name: username // <--- 3. Passing it into the backend request payload here
+        user_name: username
       }, token);
 
       setMessages([...updatedHistory, { role: "assistant", content: res.response }]);
@@ -57,61 +57,65 @@ export default function TutorView({ sessionData, token, username, onExit }: { se
     }
   };
 
+  const isUrdu = sessionData.language === "urdu";
+
   return (
-    <div className="max-w-4xl mx-auto h-[85vh] flex flex-col bg-seerah-surface rounded-2xl shadow-sm border border-seerah-border overflow-hidden">
+    <div className="max-w-4xl mx-auto h-[85vh] h-[85dvh] flex flex-col bg-seerah-surface rounded-2xl shadow-sm border border-seerah-border overflow-hidden">
       
       {/* Header */}
-      <div className="bg-seerah-bg border-b border-seerah-border p-4 flex justify-between items-center z-10">
-        <div className="flex items-center gap-3">
+      <div className="bg-seerah-bg border-b border-seerah-border p-3 sm:p-4 flex flex-wrap gap-2 justify-between items-center z-10">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button 
             onClick={onExit}
-            className="p-2 hover:bg-seerah-border rounded-lg transition-colors text-seerah-muted hover:text-seerah-text"
+            className="p-2 shrink-0 hover:bg-seerah-border rounded-lg transition-colors text-seerah-muted hover:text-seerah-text"
             title="End Session and Return to Dashboard"
           >
             <ArrowLeft size={20} />
           </button>
-          <BookOpen className="text-seerah-accent" />
-          <h2 className="font-serif font-bold text-lg text-seerah-text">Tutor Session</h2>
+          <BookOpen className="text-seerah-accent shrink-0" size={20} />
+          <h2 className="font-serif font-bold text-base sm:text-lg text-seerah-text truncate">Tutor Session</h2>
         </div>
-        <span className="text-sm text-seerah-muted font-medium bg-white px-3 py-1 rounded-full border border-seerah-border">
+        <span className="text-xs sm:text-sm text-seerah-muted font-medium bg-white px-2.5 sm:px-3 py-1 rounded-full border border-seerah-border shrink-0">
           Pages {sessionData.start_page} - {sessionData.end_page}
         </span>
       </div>
 
       {/* Chat History / Markdown Area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 scroll-smooth">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 scroll-smooth">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+          <div key={idx} className={`flex gap-3 sm:gap-4 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             
             {/* Avatar */}
-            <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border shadow-sm ${
+            <div className={`shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border shadow-sm ${
               msg.role === "assistant" ? "bg-seerah-accent text-white border-seerah-accentHover" : "bg-white text-seerah-muted border-seerah-border"
             }`}>
-              {msg.role === "assistant" ? <BookOpen size={18} /> : <User size={18} />}
+              {msg.role === "assistant" ? <BookOpen size={16} /> : <User size={16} />}
             </div>
 
             {/* Message Bubble */}
-            <div className={`max-w-[85%] rounded-2xl p-6 shadow-sm ${
+            <div className={`max-w-[88%] sm:max-w-[85%] rounded-2xl p-4 sm:p-6 shadow-sm ${
               msg.role === "user" ? "bg-seerah-text text-white" : "bg-seerah-bg border border-seerah-border"
             }`}>
               {msg.role === "assistant" ? (
-                // Prose handles all the markdown styling beautifully
-                <div className="prose prose-stone prose-headings:font-serif prose-headings:text-seerah-text prose-p:text-seerah-text prose-strong:text-seerah-accent max-w-none leading-relaxed">
+                <div
+                  dir={isUrdu ? "rtl" : "ltr"}
+                  className={`prose prose-stone prose-headings:font-serif prose-headings:text-seerah-text prose-p:text-seerah-text prose-strong:text-seerah-accent max-w-none leading-relaxed prose-sm sm:prose-base ${isUrdu ? "urdu-text text-right" : ""}`}
+                >
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-lg">{msg.content}</p>
+                <p className="text-base sm:text-lg">{msg.content}</p>
               )}
             </div>
           </div>
         ))}
 
         {isTyping && (
-          <div className="flex gap-4">
-            <div className="shrink-0 w-10 h-10 rounded-full bg-seerah-accent text-white border border-seerah-accentHover flex items-center justify-center shadow-sm">
-              <BookOpen size={18} />
+          <div className="flex gap-3 sm:gap-4">
+            <div className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-seerah-accent text-white border border-seerah-accentHover flex items-center justify-center shadow-sm">
+              <BookOpen size={16} />
             </div>
-            <div className="bg-seerah-bg border border-seerah-border rounded-2xl p-6 text-seerah-muted flex items-center gap-2">
+            <div className="bg-seerah-bg border border-seerah-border rounded-2xl p-4 sm:p-6 text-seerah-muted flex items-center gap-2 text-sm sm:text-base">
               <span className="animate-pulse">The scholar is analyzing the text...</span>
             </div>
           </div>
@@ -119,7 +123,7 @@ export default function TutorView({ sessionData, token, username, onExit }: { se
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-white border-t border-seerah-border">
+      <div className="p-3 sm:p-4 bg-white border-t border-seerah-border">
         <div className="max-w-3xl mx-auto relative flex items-center">
           <textarea
             value={input}
@@ -135,17 +139,17 @@ export default function TutorView({ sessionData, token, username, onExit }: { se
                 e.currentTarget.style.height = "auto";
               }
             }}
-            placeholder="Ask a question... (Shift + Enter for new line)"
+            placeholder="Ask a question..."
             rows={1}
-            className="w-full bg-seerah-bg border border-seerah-border rounded-xl py-4 pl-6 pr-16 text-seerah-text focus:outline-none focus:ring-2 focus:ring-seerah-accent transition-all resize-none overflow-y-auto max-h-[200px]"
-            style={{ minHeight: "58px" }}
+            className="w-full bg-seerah-bg border border-seerah-border rounded-xl py-3.5 sm:py-4 pl-4 sm:pl-6 pr-14 sm:pr-16 text-sm sm:text-base text-seerah-text focus:outline-none focus:ring-2 focus:ring-seerah-accent transition-all resize-none overflow-y-auto max-h-[200px]"
+            style={{ minHeight: "50px" }}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isTyping}
             className="absolute right-2 p-2 bg-seerah-accent text-white rounded-lg hover:bg-seerah-accentHover transition-colors disabled:opacity-50"
           >
-            <Send size={20} />
+            <Send size={18} />
           </button>
         </div>
       </div>
