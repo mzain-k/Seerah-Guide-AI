@@ -34,7 +34,7 @@ app = FastAPI(
 # Configure CORS so your Next.js frontend (running on port 3000) can talk to this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://seerah-guide-ai.onrender.com"],
+    allow_origins=["http://localhost:3000", "https://seerah-guide-ai.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
