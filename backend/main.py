@@ -196,4 +196,18 @@ async def save_quiz_score(request: ScoreRequest, user_id: str = Depends(get_curr
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/book/page/{page_number}")
+async def get_book_page(page_number: int, user_id: str = Depends(get_current_user)):
+    """Returns the raw text for a single page, for the in-app reader."""
+    try:
+        text = data_service.get_page_range(page_number, page_number)
+        return {"page": page_number, "text": text}
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@app.get("/api/book/meta")
+async def get_book_meta(user_id: str = Depends(get_current_user)):
+    """Returns book metadata (total pages) for reader navigation."""
+    return {"total_pages": data_service.total_pages}
+
 # Run locally using: uvicorn main:app --reload

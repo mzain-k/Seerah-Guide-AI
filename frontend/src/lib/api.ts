@@ -167,3 +167,23 @@ export const saveQuizScore = async (sessionId: string, score: number, totalQuest
 
   return await response.json();
 };
+
+export async function fetchBookPage(pageNumber: number, token: string): Promise<{ page: number; text: string }> {
+  const response = await fetch(`${API_BASE_URL}/api/book/page/${pageNumber}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    throw new Error("Failed to load page");
+  }
+  return await response.json();
+}
+
+export async function fetchBookMeta(token: string): Promise<{ total_pages: number }> {
+  const response = await fetch(`${API_BASE_URL}/api/book/meta`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (!response.ok) {
+    throw new Error("Failed to load book metadata");
+  }
+  return await response.json();
+}

@@ -7,6 +7,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import QuizView from "@/components/QuizView";
 import TutorView from "@/components/TutorView";
 import LoginView from "@/components/LoginView";
+import ReaderView from "@/components/ReaderView"
 
 const formatName = (name: string) => name ? name.charAt(0).toUpperCase() + name.slice(1) : "";
 
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [history, setHistory] = useState<any[]>([]);
   const [username, setUsername] = useState<string>("");
+  const [showReader, setShowReader] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("seerah_auth_token");
@@ -117,6 +119,24 @@ export default function Dashboard() {
     );
   }
 
+  if (showReader) {
+  return (
+    <main className="min-h-dvh bg-seerah-bg p-4 sm:p-6 md:p-8">
+      <ReaderView
+        token={token!}
+        onExit={() => setShowReader(false)}
+        onQuizMe={(start, end) => {
+          setStartPage(start);
+          setEndPage(end);
+          setSessionType("quiz");
+          setShowReader(false);
+          // Optionally auto-submit here instead of just pre-filling the form
+        }}
+      />
+    </main>
+  );
+}
+
   // Prevent hydration errors by waiting for localStorage check
   if (!isHydrated) return null; 
 
@@ -143,6 +163,7 @@ export default function Dashboard() {
         sessions={history} 
         onLogout={handleLogout} 
         onSelectSession={(session) => setResult(session)}
+        onOpenReader={() => setShowReader(true)}
       />
 
       {/* Main Content Area */}

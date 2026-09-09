@@ -1,17 +1,19 @@
-import { MessageSquare, HelpCircle, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { MessageSquare, HelpCircle, ChevronLeft, ChevronRight, LogOut, BookOpen } from "lucide-react";
 
 export default function Sidebar({
   isOpen,
   setIsOpen,
   sessions,
   onLogout,
-  onSelectSession
+  onSelectSession,
+  onOpenReader
 }: {
   isOpen: boolean;
   setIsOpen: (v: boolean) => void;
   sessions: any[];
   onLogout: () => void;
   onSelectSession: (session: any) => void;
+  onOpenReader: () => void;
 }) {
   const quizzes = sessions.filter(s => s.session_type === "quiz");
   const tutors = sessions.filter(s => s.session_type === "tutor");
@@ -54,6 +56,17 @@ export default function Sidebar({
         {isOpen && <span className="font-bold font-serif text-seerah-text truncate">My History</span>}
         <button onClick={() => setIsOpen(!isOpen)} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500">
           {isOpen ? <ChevronLeft size={20}/> : <ChevronRight size={20}/>}
+        </button>
+      </div>
+
+      <div className="p-3 border-b border-seerah-border shrink-0">
+        <button
+          onClick={onOpenReader}
+          className={`flex items-center gap-3 text-seerah-accent hover:bg-seerah-bg p-2.5 rounded-lg w-full transition-colors border border-seerah-border ${!isOpen && 'justify-center'}`}
+          title={!isOpen ? "Open Reader" : undefined}
+        >
+          <BookOpen size={18} className="shrink-0" />
+          {isOpen && <span className="text-sm font-medium">Open Reader</span>}
         </button>
       </div>
 
