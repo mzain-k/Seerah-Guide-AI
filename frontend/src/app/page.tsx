@@ -24,14 +24,18 @@ export default function Dashboard() {
     setIsHydrated(true);
   }, []);
 
-  // Fetch history from Supabase whenever the token changes (i.e., user logs in)
+  // Persistent Result State
+  const [result, setResult] = useLocalStorage<StudyResponse | null>("seerah_active_session", null);
+
+  // Fetch history from Supabase whenever the token changes (login) or when
+  // the user returns to the dashboard (result clears) — keeps scores fresh
   useEffect(() => {
-    if (token) {
+    if (token && !result) {
       fetchSessions(token)
         .then(data => setHistory(data.sessions))
         .catch(err => console.error("Failed to load history:", err));
     }
-  }, [token]);
+  }, [token, result]);
 
   const handleLogout = () => {
     localStorage.removeItem("seerah_auth_token");
@@ -44,9 +48,6 @@ export default function Dashboard() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Persistent Result State
-  const [result, setResult] = useLocalStorage<StudyResponse | null>("seerah_active_session", null);
 
   // Form States
   const [startPage, setStartPage] = useState<number>(24);
