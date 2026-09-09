@@ -39,8 +39,10 @@ def generate_quiz(text: str, language: Language) -> list[QuizQuestion]:
     """Generates a 20-question quiz returning a strict JSON array matching QuizQuestion."""
     prompt = f"""
     Objective: Generate exactly 20 multiple-choice questions based ONLY on the provided text.
-    Focus: Test historical facts, tribal dynamics, and extract philosophical or psychological lessons.
+    Focus: Test and extract philosophical or psychological lessons, historical facts, tribal dynamics, and politics.
     Language Instruction: {_get_language_instruction(language)}
+    
+    CRITICAL - Answer Placement: The position of the correct answer among the options MUST be randomized and evenly distributed across all questions. Do NOT default to placing the correct answer first. Vary it across every question so no predictable pattern emerges (e.g., across 20 questions, the correct answer should land in each position roughly 5 times randomly).
     
     Source Text:
     {text}
