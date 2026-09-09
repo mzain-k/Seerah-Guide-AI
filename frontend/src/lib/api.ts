@@ -147,7 +147,7 @@ export async function fetchSessions(token: string) {
 }
 
 export const saveQuizScore = async (sessionId: string, score: number, totalQuestions: number, token: string) => {
-  const response = await fetch("http://localhost:8000/api/quiz/score", {
+  const response = await fetch(`${API_BASE_URL}/api/quiz/score`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
