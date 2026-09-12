@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { fetchBookPage, fetchBookMeta } from "@/lib/api";
-import { ArrowLeft, ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 
 export default function ReaderView({
   token,
@@ -11,14 +11,14 @@ export default function ReaderView({
 }: {
   token: string;
   onExit: () => void;
-  onQuizMe: (startPage: number, endPage: number) => void;
+  onQuizMe: (startPage: number, endPage: number, language: "english" | "urdu") => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number | null>(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
   const [rangeStart, setRangeStart] = useState(1);
-  const [viewMode, setViewMode] = useState<"text" | "pdf">("text");
+  const [language, setLanguage] = useState<"english" | "urdu">("english");
 
   useEffect(() => {
     fetchBookMeta(token)
@@ -27,7 +27,7 @@ export default function ReaderView({
   }, [token]);
 
   useEffect(() => {
-    if (viewMode !== "text") return;
+    if (language !== "english") return;
     setLoading(true);
     fetchBookPage(currentPage, token)
       .then((data) => setText(data.text))
@@ -36,7 +36,7 @@ export default function ReaderView({
         setText("Could not load this page.");
       })
       .finally(() => setLoading(false));
-  }, [currentPage, token, viewMode]);
+  }, [currentPage, token, language]);
 
   const goPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goNext = () => setCurrentPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1));
@@ -59,19 +59,19 @@ export default function ReaderView({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Text / PDF toggle */}
+          {/* English / Urdu toggle */}
           <div className="flex bg-white border border-seerah-border rounded-lg overflow-hidden text-xs sm:text-sm">
             <button
-              onClick={() => setViewMode("text")}
-              className={`px-3 py-1.5 font-medium transition-colors ${viewMode === "text" ? "bg-seerah-accent text-white" : "text-seerah-muted hover:bg-seerah-bg"}`}
+              onClick={() => setLanguage("english")}
+              className={`px-3 py-1.5 font-medium transition-colors ${language === "english" ? "bg-seerah-accent text-white" : "text-seerah-muted hover:bg-seerah-bg"}`}
             >
-              Text
+              English
             </button>
             <button
-              onClick={() => setViewMode("pdf")}
-              className={`px-3 py-1.5 font-medium transition-colors flex items-center gap-1 ${viewMode === "pdf" ? "bg-seerah-accent text-white" : "text-seerah-muted hover:bg-seerah-bg"}`}
+              onClick={() => setLanguage("urdu")}
+              className={`px-3 py-1.5 font-medium transition-colors ${language === "urdu" ? "bg-seerah-accent text-white" : "text-seerah-muted hover:bg-seerah-bg"}`}
             >
-              <FileText size={14} /> Original
+              اردو
             </button>
           </div>
 
@@ -82,7 +82,7 @@ export default function ReaderView({
       </div>
 
       {/* Page Content */}
-      {viewMode === "text" ? (
+      {language === "english" ? (
         <div className="flex-1 overflow-y-auto p-6 sm:p-12">
           {loading ? (
             <p className="text-seerah-muted animate-pulse">Loading page...</p>
@@ -98,9 +98,9 @@ export default function ReaderView({
         <div className="flex-1 bg-gray-100">
           <iframe
             key={currentPage}
-            src={`/book.pdf#page=${currentPage}`}
+            src={`/book-urdu.pdf#page=${currentPage}`}
             className="w-full h-full border-0"
-            title="Original book PDF"
+            title="Urdu book PDF"
           />
         </div>
       )}
@@ -116,7 +116,7 @@ export default function ReaderView({
         </button>
 
         <button
-          onClick={() => onQuizMe(rangeStart, currentPage)}
+          onClick={() => onQuizMe(rangeStart, currentPage, language)}
           className="flex-1 text-center bg-seerah-accent text-white py-2.5 rounded-xl font-medium hover:bg-seerah-accentHover transition-colors text-sm sm:text-base"
         >
           Quiz me on pages {rangeStart}–{currentPage}
