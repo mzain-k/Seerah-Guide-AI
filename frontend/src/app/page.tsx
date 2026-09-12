@@ -174,9 +174,13 @@ export default function Dashboard() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-seerah-text mb-4">
               Seerah Tutor
             </h1>
+            <h2 className="text-1xl sm:text-2xl md:text-3xl font-serif font-bold text-seerah-text mb-4">
+              Please take pages refernce from English Book.
+            </h2>
             <p className="text-seerah-muted text-base sm:text-lg max-w-xl mx-auto">
               Configure your study session parameters to generate personalized questions or begin an interactive tutoring dialogue.
             </p>
+
           </div>
 
           <div className="bg-seerah-surface p-5 sm:p-8 rounded-2xl shadow-sm border border-seerah-border">

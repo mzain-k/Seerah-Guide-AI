@@ -36,3 +36,4 @@ Thumbs.db
 # ========================
 # Note: If your PDF is massive, ignore it. 
 # The seerah_pages.json is small enough to commit, but the PDF should stay local.
+*.pdf
