@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchBookPage, fetchBookMeta } from "@/lib/api";
+import { fetchBookMeta } from "@/lib/api";
 import { ArrowLeft, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 
 export default function ReaderView({
@@ -15,8 +15,6 @@ export default function ReaderView({
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number | null>(null);
-  const [text, setText] = useState("");
-  const [loading, setLoading] = useState(true);
   const [rangeStart, setRangeStart] = useState(1);
   const [language, setLanguage] = useState<"english" | "urdu">("english");
 
@@ -26,20 +24,10 @@ export default function ReaderView({
       .catch((err) => console.error("Failed to load book metadata:", err));
   }, [token]);
 
-  useEffect(() => {
-    if (language !== "english") return;
-    setLoading(true);
-    fetchBookPage(currentPage, token)
-      .then((data) => setText(data.text))
-      .catch((err) => {
-        console.error("Failed to load page:", err);
-        setText("Could not load this page.");
-      })
-      .finally(() => setLoading(false));
-  }, [currentPage, token, language]);
-
   const goPrev = () => setCurrentPage((p) => Math.max(1, p - 1));
   const goNext = () => setCurrentPage((p) => (totalPages ? Math.min(totalPages, p + 1) : p + 1));
+
+  const pdfSrc = language === "english" ? "/book.pdf" : "/book-urdu.pdf";
 
   return (
     <div className="max-w-3xl mx-auto h-[calc(100dvh-2rem)] sm:h-[85vh] flex flex-col bg-seerah-surface rounded-2xl shadow-sm border border-seerah-border overflow-hidden">
@@ -81,29 +69,15 @@ export default function ReaderView({
         </div>
       </div>
 
-      {/* Page Content */}
-      {language === "english" ? (
-        <div className="flex-1 overflow-y-auto p-6 sm:p-12">
-          {loading ? (
-            <p className="text-seerah-muted animate-pulse">Loading page...</p>
-          ) : (
-            <div className="max-w-[65ch] mx-auto">
-              <p className="font-serif text-lg sm:text-xl leading-[1.9] text-seerah-text first-letter:text-5xl first-letter:font-bold first-letter:text-seerah-accent first-letter:mr-2 first-letter:float-left first-letter:leading-none">
-                {text}
-              </p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex-1 bg-gray-100">
-          <iframe
-            key={currentPage}
-            src={`/book-urdu.pdf#page=${currentPage}`}
-            className="w-full h-full border-0"
-            title="Urdu book PDF"
-          />
-        </div>
-      )}
+      {/* PDF Viewer */}
+      <div className="flex-1 bg-gray-100">
+        <iframe
+          key={`${language}-${currentPage}`}
+          src={`${pdfSrc}#page=${currentPage}`}
+          className="w-full h-full border-0"
+          title={language === "english" ? "English book PDF" : "Urdu book PDF"}
+        />
+      </div>
 
       {/* Navigation + Quiz Trigger */}
       <div className="p-3 sm:p-4 bg-white border-t border-seerah-border flex items-center justify-between gap-2">
